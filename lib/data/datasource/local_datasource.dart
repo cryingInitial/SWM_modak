@@ -17,8 +17,6 @@ class LocalDataSource {
   static Box authBox = Hive.box("auth");
   static Box userBox = Hive.box("user");
   static Box todoBox = Hive.box("todo");
-  // static Box chatBox = Hive.box("chat");
-  // static Box albumBox = Hive.box("album");
 
   /// auth
   /// └ getters

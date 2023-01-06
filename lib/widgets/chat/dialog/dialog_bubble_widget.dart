@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:modak_flutter_app/assets/icons/light/LightIcons_icons.dart';
 import 'package:modak_flutter_app/constant/coloring.dart';
+import 'package:modak_flutter_app/constant/enum/chat_enum.dart';
 import 'package:modak_flutter_app/constant/font.dart';
 import 'package:modak_flutter_app/data/dto/chat.dart';
 import 'package:modak_flutter_app/provider/chat_provider.dart';
@@ -79,18 +80,18 @@ class _DialogBubbleWidgetState extends State<DialogBubbleWidget> {
                 Get.back();
               }
             },
-            // {
-            //   'name': '집안일 등록',
-            //   'icon': Icon(
-            //     LightIcons.Plus,
-            //     color: Coloring.gray_0,
-            //   ),
-            //   'onTap': () {
-            //     Get.back();
-            //     chatProvider.chatMode = ChatMode.functionTodo;
-            //     chatProvider.todoTitle = widget.chat.content;
-            //   }
-            // },
+            {
+              'name': '집안일 등록',
+              'icon': Icon(
+                LightIcons.Plus,
+                color: Coloring.gray_0,
+              ),
+              'onTap': () {
+                Get.back();
+                chatProvider.chatMode = ChatMode.functionTodo;
+                chatProvider.todoTitle = widget.chat.content;
+              }
+            },
             {
               'name': '룰렛 돌리기',
               'icon': Icon(

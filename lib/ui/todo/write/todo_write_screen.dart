@@ -40,9 +40,11 @@ class _TodoWriteScreenState extends State<TodoWriteScreen> {
 
   @override
   void initState() {
-    title = widget.title ?? "";
-    manager = widget.manager;
-    date = widget.date ?? DateTime.now();
+    setState(() {
+      title = widget.title ?? "";
+      manager = widget.manager;
+      date = widget.date ?? DateTime.now();
+    });
     super.initState();
   }
 
@@ -76,7 +78,8 @@ class _TodoWriteScreenState extends State<TodoWriteScreen> {
                 title: "할 일 추가하기",
                 leading: FunctionalIcon.back,
                 onClickLeading: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context,
+                      [title, manager, Date.getFormattedDate(dateTime: date)]);
                 },
                 bgColor: Colors.white,
               ),
@@ -104,6 +107,7 @@ class _TodoWriteScreenState extends State<TodoWriteScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 13),
                           child: InputTextWidget(
+                            initText: title,
                             autofocus: true,
                             isSatisfied: title.trim().isNotEmpty,
                             onChanged: (String text) {

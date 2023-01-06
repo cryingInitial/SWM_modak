@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:modak_flutter_app/assets/icons/light/LightIcons_icons.dart';
 import 'package:modak_flutter_app/constant/coloring.dart';
+import 'package:modak_flutter_app/constant/enum/chat_enum.dart';
 import 'package:modak_flutter_app/constant/shadowing.dart';
 import 'package:modak_flutter_app/data/dto/todo.dart';
 import 'package:modak_flutter_app/data/dto/user.dart';
@@ -49,6 +51,12 @@ class _FunctionTodoWidgetState extends State<FunctionTodoWidget> {
   Widget build(BuildContext context) {
     return Consumer3<ChatProvider, UserProvider, TodoProvider>(
       builder: (context, chatProvider, userProvider, todoProvider, child) {
+        if (todo.title.isEmpty) {
+          todo.title = context.read<ChatProvider>().todoTitle;
+        }
+        if (todo.memberId == -1) {
+          todo.memberId = context.read<UserProvider>().me!.memberId;
+        }
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 30),
           decoration: BoxDecoration(
@@ -73,11 +81,14 @@ class _FunctionTodoWidgetState extends State<FunctionTodoWidget> {
                 child: InputSelectWidget(
                   leftIconData: LightIcons.Profile,
                   title: "담당",
-                  contents: "",
+                  contents: userProvider.findUserById(todo.memberId)!.name,
                   isFilled: true,
                   buttons: {
                     for (User family in userProvider.familyMembers)
                       family.name: () {
+                        setState(() {
+                          todo.memberId = family.memberId;
+                        });
                         Get.back();
                       }
                   },
@@ -94,6 +105,7 @@ class _FunctionTodoWidgetState extends State<FunctionTodoWidget> {
                     });
                   },
                   currTime: DateTime.parse(todo.date),
+                  maxTime: DateTime(2025),
                 ),
               ),
               Padding(
@@ -103,10 +115,24 @@ class _FunctionTodoWidgetState extends State<FunctionTodoWidget> {
                   title: "옵션 더보기",
                   contents: "",
                   isFilled: false,
-                  onTap: () {
-                    Get.to(TodoWriteScreen(
-                      title: chatProvider.todoTitle,
-                    ));
+                  onTap: () async {
+                    List<dynamic>? result = await Get.to(
+                        TodoWriteScreen(
+                          title: todo.title,
+                          manager: userProvider.findUserById(todo.memberId),
+                          date: DateTime.parse(todo.date),
+                        ),
+                        preventDuplicates: false);
+                    if (result == null) {
+                      return;
+                    } else {
+                      setState(() {
+                        todo.title = result[0];
+                        todo.memberId = (result[1] as User?)?.memberId ??
+                            userProvider.me!.memberId;
+                        todo.date = result[2];
+                      });
+                    }
                   },
                 ),
               ),
@@ -117,7 +143,9 @@ class _FunctionTodoWidgetState extends State<FunctionTodoWidget> {
                   title: "일정 등록하기",
                   isValid: todo.title.trim().isNotEmpty,
                   onPressed: () async {
-                    if (await todoProvider.postTodo(todo)) ;
+                    todoProvider.postTodo(todo);
+                    chatProvider.chatMode = ChatMode.textInput;
+                    Fluttertoast.showToast(msg: "집안일이 등록되었습니다.");
                   },
                   color: Coloring.main,
                   shadow: Shadowing.yellow,
